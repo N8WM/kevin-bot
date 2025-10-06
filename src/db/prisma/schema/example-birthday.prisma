@@ -1,0 +1,25 @@
+// EXAMPLE APPLICATION - Birthday Tracker
+// This file can be safely deleted when creating your own bot
+// See EXAMPLE_APP.md for removal instructions
+
+model ExampleBirthday {
+  id        String   @id @default(cuid())
+  userId    String   @unique // Discord user ID
+  month     Int      // 1-12
+  day       Int      // 1-31
+  year      Int?     // Optional - for calculating age
+  guildId   String   // Which server this birthday is registered in
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([guildId])
+  @@index([month, day])
+}
+
+model ExampleBirthdayConfig {
+  id                String   @id @default(cuid())
+  guildId           String   @unique // One config per server
+  announcementChannel String? // Channel ID for birthday announcements
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

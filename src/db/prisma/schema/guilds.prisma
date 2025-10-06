@@ -1,0 +1,5 @@
+model Guild {
+  snowflake String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
