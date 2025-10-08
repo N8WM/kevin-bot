@@ -13,7 +13,7 @@ import { build as buildBirthdayBody } from "@app/components/containers/birthdayC
 const handler: TaskHandler = {
   name: "Birthday Reminder",
   schedule: "0 0 0 * * *", // Run once per day
-  runOnStart: true, // Don't run immediately on startup
+  runOnStart: false, // Don't run immediately on startup
 
   async execute({ client, context }) {
     Logger.debug("Checking for birthdays today...");
