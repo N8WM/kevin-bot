@@ -1,7 +1,7 @@
 import {
   ApplicationCommandType,
   InteractionContextType,
-  SlashCommandBuilder,
+  SlashCommandBuilder
 } from "discord.js";
 
 import { CommandHandler } from "@core/registry";
@@ -16,7 +16,7 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
   async run({ interaction }) {
     const sent = await interaction.reply({
       content: "Pinging...",
-      fetchReply: true,
+      fetchReply: true
     });
 
     const latency = sent.createdTimestamp - interaction.createdTimestamp;
@@ -25,7 +25,7 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
     await interaction.editReply(
       `Pong! 🏓\nLatency: ${latency}ms\nAPI Latency: ${apiLatency}ms`
     );
-  },
+  }
 };
 
 export default handler;

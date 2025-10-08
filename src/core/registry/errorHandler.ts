@@ -12,36 +12,36 @@ import { Command } from "./command";
 /**
  * Different contexts where errors can occur
  */
-export type ErrorContext =
+export type ErrorContext
+  = | {
+    type: "command";
+    interaction: CommandInteraction;
+    command: Command;
+    client: Client;
+  }
   | {
-      type: "command";
-      interaction: CommandInteraction;
-      command: Command;
-      client: Client;
-    }
+    type: "autocomplete";
+    interaction: AutocompleteInteraction;
+    command: Command;
+    client: Client;
+  }
   | {
-      type: "autocomplete";
-      interaction: AutocompleteInteraction;
-      command: Command;
-      client: Client;
-    }
+    type: "component";
+    interaction: ButtonInteraction | ModalSubmitInteraction | AnySelectMenuInteraction;
+    componentId: string;
+    client: Client;
+  }
   | {
-      type: "component";
-      interaction: ButtonInteraction | ModalSubmitInteraction | AnySelectMenuInteraction;
-      componentId: string;
-      client: Client;
-    }
+    type: "event";
+    eventName: string;
+    client: Client;
+  }
   | {
-      type: "event";
-      eventName: string;
-      client: Client;
-    }
-  | {
-      type: "middleware";
-      interaction: CommandInteraction;
-      middlewareName?: string;
-      client: Client;
-    }
+    type: "middleware";
+    interaction: CommandInteraction;
+    middlewareName?: string;
+    client: Client;
+  }
   | {
       type: "task";
       taskName: string;
@@ -87,12 +87,14 @@ export class ErrorHandlerRegistry {
     if (handler) {
       try {
         await handler(error, context);
-      } catch (handlerError) {
+      }
+      catch (handlerError) {
         // Error handler itself failed - log to console as fallback
         console.error("Error handler failed:", handlerError);
         console.error("Original error:", error);
       }
-    } else {
+    }
+    else {
       // No handler registered - log to console as fallback
       console.error(`Unhandled error in ${context.type} context:`, error);
     }

@@ -2,11 +2,11 @@ import { Logger } from "@core/logger";
 import { PrismaClient } from "@prisma/client";
 
 import { GuildService } from "./guildService";
-import { ExampleBirthdayService } from "./exampleBirthdayService"; // EXAMPLE APP - Remove this line
+import { BirthdayService } from "./birthdayService";
 
 export class ServiceManager {
   static guild: GuildService;
-  static exampleBirthday: ExampleBirthdayService; // EXAMPLE APP - Remove this line
+  static birthday: BirthdayService;
 
   static initialized = false;
 
@@ -17,7 +17,7 @@ export class ServiceManager {
     }
 
     ServiceManager.guild = new GuildService(prisma);
-    ServiceManager.exampleBirthday = new ExampleBirthdayService(prisma); // EXAMPLE APP - Remove this line
+    ServiceManager.birthday = new BirthdayService(prisma);
 
     ServiceManager.initialized = true;
   }

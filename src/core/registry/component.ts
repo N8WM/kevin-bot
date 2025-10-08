@@ -84,7 +84,8 @@ export class ComponentRegistry {
         if (regex.test(customId)) {
           return handler;
         }
-      } catch {
+      }
+      catch {
         // Not a valid regex, skip
         continue;
       }
@@ -109,7 +110,8 @@ export class ComponentRegistry {
         if (regex.test(customId)) {
           return handler;
         }
-      } catch {
+      }
+      catch {
         continue;
       }
     }
@@ -133,7 +135,8 @@ export class ComponentRegistry {
         if (regex.test(customId)) {
           return handler;
         }
-      } catch {
+      }
+      catch {
         continue;
       }
     }

@@ -15,7 +15,8 @@ export type FileNode<T> = {
 const isDir = async (path: string): Promise<boolean> => {
   try {
     return (await lstat(path)).isDirectory();
-  } catch {
+  }
+  catch {
     return false;
   }
 };
@@ -32,7 +33,7 @@ const isJtsFile = (name: string): boolean => name.endsWith(".js") || name.endsWi
 export async function read<T>(
   dir: string,
   callback: (node: FileNode<T>, depth: number) => void,
-  depth: number = 0,
+  depth: number = 0
 ): Promise<void> {
   // Check if directory exists
   if (!existsSync(dir)) {
@@ -42,7 +43,8 @@ export async function read<T>(
   let entries: string[];
   try {
     entries = await readdir(dir);
-  } catch (error) {
+  }
+  catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to read directory ${dir}: ${message}`);
   }
@@ -72,14 +74,15 @@ export async function read<T>(
           isFile: true,
           name: name.replace(/\.(js|ts)$/, ""),
           parent: basename(dir),
-          data: module.default as T,
+          data: module.default as T
         };
-      } catch (error) {
+      }
+      catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         Logger.error(`Failed to import ${fpath}: ${message}`);
         return null;
       }
-    }),
+    })
   );
 
   // Process file nodes

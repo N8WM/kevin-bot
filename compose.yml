@@ -1,4 +1,4 @@
-name: dbot-template
+name: dva-bot
 
 services:
   db:

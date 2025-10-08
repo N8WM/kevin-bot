@@ -43,12 +43,12 @@ const config = {
     events: resolveAppPath("events"),
     components: resolveAppPath("components"),
     tasks: resolveAppPath("tasks"),
-    errorHandlers: resolveAppPath("errorHandlers"),
+    errorHandlers: resolveAppPath("errorHandlers")
   },
   healthCheck: {
     enabled: process.env["ENABLE_HEALTH_CHECK"] === "true",
-    port: process.env["HEALTH_CHECK_PORT"] ? parseInt(process.env["HEALTH_CHECK_PORT"]) : 3000,
-  },
+    port: parseInt(requireEnv("HEALTH_CHECK_PORT", "3000"))
+  }
 };
 
 export default config;

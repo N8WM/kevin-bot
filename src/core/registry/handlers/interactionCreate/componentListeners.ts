@@ -1,4 +1,4 @@
-import { Events, InteractionReplyOptions, MessageFlags } from "discord.js";
+import { Events } from "discord.js";
 
 import { Logger } from "@core/logger";
 import { ComponentRegistry } from "../../component";

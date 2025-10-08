@@ -27,12 +27,12 @@ export class CommandRegistrar {
     if (scope.type === "guild") {
       return {
         path: Routes.applicationGuildCommands(this._clientId, scope.guildId),
-        label: `GUILD application commands (for <${scope.guildId}>)`,
+        label: `GUILD application commands (for <${scope.guildId}>)`
       };
     }
     return {
       path: Routes.applicationCommands(this._clientId),
-      label: `GLOBAL application commands`,
+      label: `GLOBAL application commands`
     };
   }
 
@@ -58,8 +58,8 @@ export class CommandRegistrar {
 
     const failure = async (err: Error) => {
       Logger.error(`${ind(1)}[/] Failed to bulk-update ${route.label}`);
-      let failures = (await Promise.all(data.map(updateOne))) as number[];
-      let failureCount = failures.reduce((acc, curr) => acc + curr, 0);
+      const failures = (await Promise.all(data.map(updateOne))) as number[];
+      const failureCount = failures.reduce((acc, curr) => acc + curr, 0);
       if (failureCount === 0)
         Logger.error(`${ind(2)} All commands updated; initial error:\n${err}`);
     };

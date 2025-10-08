@@ -5,6 +5,7 @@ declare global {
       DEV_GUILD_IDS?: string;
       DISCORD_INTENTS?: string;
       DATABASE_URL?: string;
+      SHADOW_DATABASE_URL?: string;
     }
   }
 }

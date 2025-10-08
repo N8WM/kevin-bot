@@ -21,10 +21,12 @@ const handler: ErrorHandler = async (error, context) => {
   try {
     if (context.interaction.deferred || context.interaction.replied) {
       await context.interaction.editReply(response.content);
-    } else {
+    }
+    else {
       await context.interaction.reply(response);
     }
-  } catch (replyError) {
+  }
+  catch (replyError) {
     Logger.error(`Failed to send error message: ${replyError instanceof Error ? replyError.message : String(replyError)}`);
   }
 };

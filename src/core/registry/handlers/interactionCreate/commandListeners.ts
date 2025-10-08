@@ -1,4 +1,4 @@
-import { Events, InteractionReplyOptions, MessageFlags } from "discord.js";
+import { Events, MessageFlags } from "discord.js";
 
 import { Logger } from "@core/logger";
 import { hasPermissions, botHasPermissions, getMissingPermissions, getBotMissingPermissions } from "@lib/permissions";

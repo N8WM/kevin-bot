@@ -23,7 +23,8 @@ const handler: EventHandler<Events.InteractionCreate> = {
 
     try {
       await handler.autocomplete({ interaction, client: interaction.client });
-    } catch (e) {
+    }
+    catch (e) {
       const error = e instanceof Error ? e : new Error(String(e));
 
       await ErrorHandlerRegistry.handle(error, {

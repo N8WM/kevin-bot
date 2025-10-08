@@ -19,7 +19,7 @@ export type Event = {
 };
 
 export function asHandlerOf<K extends keyof ClientEvents>(
-  handler: AnyEventHandler,
+  handler: AnyEventHandler
 ): EventHandler<K> {
   return handler as EventHandler<K>;
 }

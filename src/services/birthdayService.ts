@@ -1,7 +1,3 @@
-// EXAMPLE APPLICATION - Birthday Tracker
-// This file can be safely deleted when creating your own bot
-// See EXAMPLE_APP.md for removal instructions
-
 import { BaseService } from "./baseService";
 
 export type BirthdayInput = {
@@ -12,7 +8,7 @@ export type BirthdayInput = {
   year?: number;
 };
 
-export class ExampleBirthdayService extends BaseService {
+export class BirthdayService extends BaseService {
   /**
    * Set or update a user's birthday
    */
@@ -27,16 +23,18 @@ export class ExampleBirthdayService extends BaseService {
       throw new Error(`Day must be between 1 and ${daysInMonth} for month ${data.month}`);
     }
 
-    return await this.prisma.exampleBirthday.upsert({
+    return await this.prisma.birthday.upsert({
       where: {
-        userId: data.userId
+        userId_guildId: {
+          userId: data.userId,
+          guildId: data.guildId
+        }
       },
       create: data,
       update: {
         month: data.month,
         day: data.day,
-        year: data.year,
-        guildId: data.guildId
+        year: data.year
       }
     });
   }
@@ -44,26 +42,47 @@ export class ExampleBirthdayService extends BaseService {
   /**
    * Get a user's birthday
    */
-  async getBirthday(userId: string) {
-    return await this.prisma.exampleBirthday.findUnique({
-      where: { userId }
+  async getBirthday(userId: string, guildId: string) {
+    return await this.prisma.birthday.findUnique({
+      where: { userId_guildId: { userId, guildId } }
     });
   }
 
   /**
    * Remove a user's birthday
    */
-  async removeBirthday(userId: string) {
-    return await this.prisma.exampleBirthday.delete({
-      where: { userId }
+  async removeBirthday(userId: string, guildId: string) {
+    return await this.prisma.birthday.delete({
+      where: { userId_guildId: { userId, guildId } }
     });
+  }
+
+  /**
+   * Remove multiple users' birthdays
+   */
+  async removeBirthdays(userIds: string[], guildId: string) {
+    return await this.prisma.birthday.deleteMany({
+      where: { guildId, userId: { in: userIds } }
+    });
+  }
+
+  /**
+   * Ensure user ID is deleted
+   */
+  async ensureRemoved(userId: string, guildId: string) {
+    try {
+      this.removeBirthday(userId, guildId);
+    }
+    catch {
+      // Silently ignore if user doesn't have a birthday
+    }
   }
 
   /**
    * Get all birthdays in a guild, sorted by next occurrence
    */
-  async getUpcomingBirthdays(guildId: string, limit: number = 10) {
-    const all = await this.prisma.exampleBirthday.findMany({
+  async getUpcomingBirthdays(guildId: string, limit: number = 5) {
+    const all = await this.prisma.birthday.findMany({
       where: { guildId }
     });
 
@@ -97,12 +116,12 @@ export class ExampleBirthdayService extends BaseService {
   /**
    * Get birthdays happening today in a specific guild
    */
-  async getTodaysBirthdays(guildId: string) {
-    const now = new Date();
+  async getTodaysBirthdays(guildId: string, nowOverride?: Date) {
+    const now = nowOverride ?? new Date();
     const month = now.getMonth() + 1;
     const day = now.getDate();
 
-    return await this.prisma.exampleBirthday.findMany({
+    return await this.prisma.birthday.findMany({
       where: {
         guildId,
         month,
@@ -115,7 +134,7 @@ export class ExampleBirthdayService extends BaseService {
    * Set the announcement channel for a guild
    */
   async setAnnouncementChannel(guildId: string, channelId: string) {
-    return await this.prisma.exampleBirthdayConfig.upsert({
+    return await this.prisma.birthdayConfig.upsert({
       where: { guildId },
       create: {
         guildId,
@@ -128,10 +147,29 @@ export class ExampleBirthdayService extends BaseService {
   }
 
   /**
+   * Set the ping recipient for a guild
+   */
+  async setPingRecipient(guildId: string, recipient: string) {
+    if (!["everyone", "here", "bd-acct"].includes(recipient))
+      throw new Error(`Ping recipient invalid: ${recipient}`);
+
+    return await this.prisma.birthdayConfig.upsert({
+      where: { guildId },
+      create: {
+        guildId,
+        pingRecipient: recipient
+      },
+      update: {
+        pingRecipient: recipient
+      }
+    });
+  }
+
+  /**
    * Get guild configuration
    */
   async getConfig(guildId: string) {
-    return await this.prisma.exampleBirthdayConfig.findUnique({
+    return await this.prisma.birthdayConfig.findUnique({
       where: { guildId }
     });
   }

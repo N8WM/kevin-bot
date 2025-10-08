@@ -26,6 +26,7 @@ async function main() {
   // Set up Registry
   await Registry.init({
     client,
+    prisma,
     token: config.token,
     commandsPath: config.paths.commands,
     eventsPath: config.paths.events,

@@ -13,9 +13,6 @@
       "@lib/*": [
         "lib/*"
       ],
-      "@test/*": [
-        "test/*"
-      ],
       "@services": [
         "services/index.ts"
       ],

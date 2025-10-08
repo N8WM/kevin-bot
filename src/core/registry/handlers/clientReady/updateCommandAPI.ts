@@ -32,7 +32,7 @@ const handler: EventHandler<Events.ClientReady> = {
       const guildDiffs = await Promise.all(
         (Registry.options.devGuildIds ?? []).map(async (id) => ({
           guildId: id,
-          diff: await differ.diff(guildCmds, { type: "guild", guildId: id }),
+          diff: await differ.diff(guildCmds, { type: "guild", guildId: id })
         }))
       );
 
@@ -47,7 +47,8 @@ const handler: EventHandler<Events.ClientReady> = {
           differ.apply(diff, { type: "guild", guildId })
         )
       );
-    } else {
+    }
+    else {
       const regGuildCmds = async (id: string) =>
         await registrar.register(guildCmds, { type: "guild", guildId: id });
 
@@ -68,7 +69,8 @@ const handler: EventHandler<Events.ClientReady> = {
 
       if (!prisma) {
         Logger.warn("Health check enabled but no Prisma client provided, skipping health check setup");
-      } else {
+      }
+      else {
         Logger.debug("Starting health check server...");
         const healthChecker = new HealthChecker(client, prisma);
 
@@ -79,12 +81,14 @@ const handler: EventHandler<Events.ClientReady> = {
             res.statusCode = status.status === "healthy" ? 200 : 503;
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify(status, null, 2));
-          } else if (req.url === "/ready") {
+          }
+          else if (req.url === "/ready") {
             const isReady = await healthChecker.isHealthy();
             res.statusCode = isReady ? 200 : 503;
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify({ ready: isReady }));
-          } else {
+          }
+          else {
             res.statusCode = 404;
             res.end("Not Found");
           }
@@ -98,7 +102,7 @@ const handler: EventHandler<Events.ClientReady> = {
 
     Logger.info(`Ready!`);
   },
-  once: true,
+  once: true
 };
 
 export default handler;

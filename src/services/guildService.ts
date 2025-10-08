@@ -1,7 +1,5 @@
 import { Snowflake } from "discord.js";
 
-import { Guild } from "@prisma/client";
-import { Result } from "@core/types/result";
 import { BaseService } from "./baseService";
 
 export enum GuildStatus {
@@ -32,13 +30,13 @@ export class GuildService extends BaseService {
       where: { snowflake: { in: snowflakes } }
     });
 
-    const existingIds = new Set(existing.map(g => g.snowflake));
-    const newGuildIds = snowflakes.filter(id => !existingIds.has(id));
+    const existingIds = new Set(existing.map((g) => g.snowflake));
+    const newGuildIds = snowflakes.filter((id) => !existingIds.has(id));
 
     // Create new guilds
     if (newGuildIds.length > 0) {
       await this.prisma.guild.createMany({
-        data: newGuildIds.map(snowflake => ({ snowflake }))
+        data: newGuildIds.map((snowflake) => ({ snowflake }))
       });
     }
 

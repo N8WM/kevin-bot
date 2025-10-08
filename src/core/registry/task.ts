@@ -1,4 +1,12 @@
 import { Client } from "discord.js";
+import { ScheduledTask, TaskContext } from "node-cron";
+import { PrismaClient } from "@prisma/client";
+
+export type TaskHandlerOptions = {
+  client: Client;
+  prisma: PrismaClient;
+  context?: TaskContext;
+};
 
 /**
  * Scheduled task handler
@@ -13,11 +21,6 @@ export type TaskHandler = {
    * - "0 *\/15 * * *" - Every 15 minutes
    * - "0 0 * * 0" - Every Sunday at midnight
    * - "0 0 1 * *" - First day of every month at midnight
-   *
-   * Or use simple intervals:
-   * - "every 1h" - Every hour
-   * - "every 30m" - Every 30 minutes
-   * - "every 1d" - Every day
    */
   schedule: string;
 
@@ -29,7 +32,7 @@ export type TaskHandler = {
   /**
    * Execute the task
    */
-  execute: (client: Client) => Promise<void>;
+  execute: (options: TaskHandlerOptions) => Promise<void>;
 
   /**
    * Whether to run immediately on startup (before first scheduled run)
@@ -40,6 +43,6 @@ export type TaskHandler = {
 export type Task = {
   handler: TaskHandler;
   name: string;
-  intervalId?: NodeJS.Timeout;
+  scheduledTask?: ScheduledTask;
   nextRun?: Date;
 };

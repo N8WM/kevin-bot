@@ -1,0 +1,27 @@
+model Birthday {
+  id        String   @id @default(cuid())
+  userId    String // Discord user ID
+  month     Int // 1-12
+  day       Int // 1-31
+  year      Int? // Optional - for calculating age
+  guildId   String // Which server this birthday is registered in
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [snowflake], onDelete: Cascade)
+
+  @@unique([userId, guildId]) // One birthday per user per guild
+  @@index([guildId])
+  @@index([month, day])
+}
+
+model BirthdayConfig {
+  id                  String   @id @default(cuid())
+  guildId             String   @unique // One config per server
+  announcementChannel String? // Channel ID for birthday announcements
+  pingRecipient       String   @default("bd-acct") // Recipient for birthday announcement pings
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  guild Guild @relation(fields: [guildId], references: [snowflake], onDelete: Cascade)
+}

@@ -13,8 +13,8 @@ export function requireEnv(key: string, defaultValue?: string): string {
       return defaultValue;
     }
     throw new Error(
-      `Missing required environment variable: ${key}\n` +
-      `Please set ${key} in your .env file or environment.`
+      `Missing required environment variable: ${key}\n`
+      + `Please set ${key} in your .env file or environment.`
     );
   }
 
@@ -57,9 +57,9 @@ export function validateEnv(): void {
 
   if (missing.length > 0) {
     throw new Error(
-      `Missing required environment variables:\n` +
-      missing.map((k) => `  - ${k}`).join("\n") +
-      `\n\nPlease check your .env file.`
+      `Missing required environment variables:\n`
+      + missing.map((k) => `  - ${k}`).join("\n")
+      + `\n\nPlease check your .env file.`
     );
   }
 }

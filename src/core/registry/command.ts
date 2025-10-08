@@ -10,7 +10,7 @@ import {
   SlashCommandSubcommandsOnlyBuilder,
   PrimaryEntryPointCommandInteraction,
   MessageContextMenuCommandInteraction,
-  AutocompleteInteraction,
+  AutocompleteInteraction
 } from "discord.js";
 
 import { Middleware } from "./middleware";
@@ -37,8 +37,8 @@ type CommandTypeMap = {
   };
 };
 
-export type CommandHandlerInteraction<T extends ApplicationCommandType> =
-  CommandTypeMap[T]["interaction"];
+export type CommandHandlerInteraction<T extends ApplicationCommandType>
+  = CommandTypeMap[T]["interaction"];
 
 export type CommandHandlerOptions = {
   devOnly?: boolean;
@@ -64,11 +64,11 @@ export type CommandHandler<T extends ApplicationCommandType> = {
   options?: CommandHandlerOptions;
 };
 
-export type AnyCommandHandler =
-  | CommandHandler<ApplicationCommandType.ChatInput>
-  | CommandHandler<ApplicationCommandType.User>
-  | CommandHandler<ApplicationCommandType.Message>
-  | CommandHandler<ApplicationCommandType.PrimaryEntryPoint>;
+export type AnyCommandHandler
+  = | CommandHandler<ApplicationCommandType.ChatInput>
+    | CommandHandler<ApplicationCommandType.User>
+    | CommandHandler<ApplicationCommandType.Message>
+    | CommandHandler<ApplicationCommandType.PrimaryEntryPoint>;
 
 export type Command = {
   handler: AnyCommandHandler;

@@ -111,7 +111,8 @@ export class CommandDiffer {
 
       if (!existingCmd) {
         diff.toCreate.push(localCmd);
-      } else if (this.commandsAreDifferent(localCmd, existingCmd)) {
+      }
+      else if (this.commandsAreDifferent(localCmd, existingCmd)) {
         diff.toUpdate.push({ id: existingCmd.id, data: localCmd });
       }
     }

@@ -15,7 +15,7 @@ const handler: EventHandler<Events.ClientReady> = {
       `Guild sync: ${result.created} created, ${result.updated} updated, ${result.deleted} deleted`
     );
   },
-  once: true,
+  once: true
 };
 
 export default handler;

@@ -8,8 +8,8 @@ const prettyStream = pino.transport({
   options: {
     colorize: true,
     translateTime: "SYS:yyyy-mm-dd HH:MM:ss",
-    ignore: "pid,hostname",
-  },
+    ignore: "pid,hostname"
+  }
 });
 
 export const Logger = pino(
@@ -17,8 +17,8 @@ export const Logger = pino(
   pino.multistream([
     { level: "info", stream: appLogStream },
     { level: "debug", stream: debugLogStream },
-    { level: "debug", stream: prettyStream },
-  ]),
+    { level: "debug", stream: prettyStream }
+  ])
 );
 
 export function ind(amount: number, bullet: string | null = null, depth = 3) {
@@ -28,8 +28,8 @@ export function ind(amount: number, bullet: string | null = null, depth = 3) {
   const sp = " ".repeat(depth * amount);
 
   return (
-    sp.substring(0, sp.length - hw) +
-    (bullet ?? " ") +
-    sp.substring(sp.length - hw + 1)
+    sp.substring(0, sp.length - hw)
+    + (bullet ?? " ")
+    + sp.substring(sp.length - hw + 1)
   );
 }

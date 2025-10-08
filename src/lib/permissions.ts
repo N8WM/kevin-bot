@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, PermissionsString, PermissionsBitField } from "discord.js";
+import { ChatInputCommandInteraction, PermissionsString } from "discord.js";
 import { Logger } from "@core/logger";
 
 /**

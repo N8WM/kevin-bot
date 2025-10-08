@@ -5,13 +5,14 @@ import { FileNode, read } from "./reader";
 import { Logger, ind } from "@core/logger";
 import { AnyCommandHandler, Command } from "./command";
 import { AnyEventHandler, Event, EventHandler } from "./event";
-import { AnyComponentHandler, ButtonHandler, ModalHandler, SelectMenuHandler, ComponentRegistry } from "./component";
+import { ButtonHandler, ModalHandler, SelectMenuHandler, ComponentRegistry } from "./component";
 import { TaskHandler } from "./task";
 import { ErrorHandler, ErrorHandlerRegistry } from "./errorHandler";
 import { TaskScheduler } from "@lib/scheduler";
 
 export type RegistryOptions = {
   client: Client;
+  prisma: PrismaClient;
   token: string;
   commandsPath: string;
   eventsPath: string;
@@ -62,7 +63,7 @@ export class Registry {
     Registry._commands = new Collection();
     Registry._events = new Collection();
 
-    Logger.debug("Registering [E]vents, [C]ommands, [Co]mponents, [T]asks, and [Err]or Handlers...");
+    Logger.debug("Registering [E]vents, [C]ommands, C[O]mponents, [T]asks, and E[R]ror Handlers...");
 
     await Registry.registerEvents();
     await Registry.registerCommands();
@@ -86,15 +87,15 @@ export class Registry {
         }
 
         Logger.debug(
-          `${ind(1)}[C] ${cname.padEnd(25)} (${node.name})${category ? " <" + category + ">" : ""}`,
+          `${ind(1)}[C] ${cname.padEnd(25)} (${node.name})${category ? " <" + category + ">" : ""}`
         );
 
         Registry._commands.set(cname, {
           handler: node.data,
           name: cname,
-          category,
+          category
         });
-      },
+      }
     );
   }
 
@@ -102,19 +103,19 @@ export class Registry {
     const builtinHandlersPath = `${__dirname}/handlers`;
 
     await read<AnyEventHandler>(builtinHandlersPath, (node, depth) =>
-      Registry.registerEvent(node, depth, true),
+      Registry.registerEvent(node, depth, true)
     );
 
     await read<AnyEventHandler>(
       Registry._opts.eventsPath,
-      Registry.registerEvent,
+      Registry.registerEvent
     );
   }
 
   private static registerEvent(
     node: FileNode<AnyEventHandler>,
     depth: number,
-    builtin: boolean = false,
+    builtin: boolean = false
   ) {
     const ename = node.parent as keyof ClientEvents;
     const ehandler = node.data as EventHandler<keyof ClientEvents>;
@@ -125,18 +126,18 @@ export class Registry {
 
     if (depth === 0 || !Object.values(Events).includes(ename as Events)) {
       Logger.error(
-        `Event Registration Error: (${node.name}) Event must be within an event-named directory`,
+        `Event Registration Error: (${node.name}) Event must be within an event-named directory`
       );
       return;
     }
 
     Logger.debug(
-      `${ind(1, builtin ? "*" : null)}[E] ${ename.padEnd(25)} (${node.name})`,
+      `${ind(1, builtin ? "*" : null)}[E] ${ename.padEnd(25)} (${node.name})`
     );
 
     const event = Registry._events.ensure(ename, () => ({
       name: ename,
-      handlers: [],
+      handlers: []
     }));
 
     event.handlers.push(ehandler);
@@ -154,11 +155,12 @@ export class Registry {
     try {
       await read<ButtonHandler>(buttonsPath, (node) => {
         const customId = node.name;
-        Logger.debug(`${ind(1)}[Co:Button] ${customId.padEnd(25)} (${node.name})`);
+        Logger.debug(`${ind(1)}[O] ${customId.padEnd(25)} (${node.name}) <button>`);
         ComponentRegistry.registerButton(customId, node.data);
       });
-    } catch (error) {
-      Logger.debug("No buttons directory found, skipping button registration");
+    }
+    catch {
+      // Silently ignore if path doesn't exist
     }
 
     // Register modals
@@ -166,11 +168,12 @@ export class Registry {
     try {
       await read<ModalHandler>(modalsPath, (node) => {
         const customId = node.name;
-        Logger.debug(`${ind(1)}[Co:Modal] ${customId.padEnd(25)} (${node.name})`);
+        Logger.debug(`${ind(1)}[O] ${customId.padEnd(25)} (${node.name}) <modal>`);
         ComponentRegistry.registerModal(customId, node.data);
       });
-    } catch (error) {
-      Logger.debug("No modals directory found, skipping modal registration");
+    }
+    catch {
+      // Silently ignore if path doesn't exist
     }
 
     // Register select menus
@@ -178,11 +181,12 @@ export class Registry {
     try {
       await read<SelectMenuHandler>(selectsPath, (node) => {
         const customId = node.name;
-        Logger.debug(`${ind(1)}[Co:Select] ${customId.padEnd(25)} (${node.name})`);
+        Logger.debug(`${ind(1)}[O] ${customId.padEnd(25)} (${node.name}) <select>`);
         ComponentRegistry.registerSelectMenu(customId, node.data);
       });
-    } catch (error) {
-      Logger.debug("No selects directory found, skipping select menu registration");
+    }
+    catch {
+      // Silently ignore if path doesn't exist
     }
   }
 
@@ -192,7 +196,7 @@ export class Registry {
       return;
     }
 
-    Registry._taskScheduler = new TaskScheduler(Registry._opts.client);
+    Registry._taskScheduler = new TaskScheduler(Registry._opts.client, Registry._opts.prisma);
 
     await read<TaskHandler>(Registry._opts.tasksPath, (node) => {
       const taskName = node.data.name ?? node.name;
@@ -212,10 +216,11 @@ export class Registry {
 
       // Special case for global handler
       if (contextType === "global") {
-        Logger.debug(`${ind(1)}[Err] global (fallback)`);
+        Logger.debug(`${ind(1)}[R] global (fallback)`);
         ErrorHandlerRegistry.registerGlobal(node.data);
-      } else {
-        Logger.debug(`${ind(1)}[Err] ${contextType.padEnd(25)} (${node.name})`);
+      }
+      else {
+        Logger.debug(`${ind(1)}[R] ${contextType.padEnd(25)} (${node.name})`);
         ErrorHandlerRegistry.register(contextType as any, node.data);
       }
     });

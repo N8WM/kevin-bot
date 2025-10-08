@@ -62,7 +62,8 @@ export class HealthChecker {
         connected: true,
         responseTime
       };
-    } catch (error) {
+    }
+    catch (error) {
       return {
         connected: false,
         error: error instanceof Error ? error.message : String(error)

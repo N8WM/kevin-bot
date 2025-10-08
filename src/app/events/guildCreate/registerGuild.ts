@@ -22,7 +22,8 @@ const handler: EventHandler<Events.GuildCreate> = {
     try {
       await ServiceManager.guild.create(guild.id);
       Logger.debug(`Registered new guild ${guild.name} in database`);
-    } catch (error) {
+    }
+    catch (error) {
       Logger.error(`Failed to register guild ${guild.name}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }

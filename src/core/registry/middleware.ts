@@ -3,9 +3,9 @@ import { ChatInputCommandInteraction, Client } from "discord.js";
 /**
  * Middleware result - either continue or stop with an error message
  */
-export type MiddlewareResult =
-  | { continue: true }
-  | { continue: false; error: string };
+export type MiddlewareResult
+  = | { continue: true }
+    | { continue: false; error: string };
 
 /**
  * Middleware function type
