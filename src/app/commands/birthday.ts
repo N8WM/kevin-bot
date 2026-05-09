@@ -2,6 +2,7 @@ import { ApplicationCommandType, ContainerBuilder, MessageFlags, SlashCommandBui
 import { CommandHandler } from "@core/registry/command";
 import { ServiceManager } from "@services";
 import { Logger } from "@core/logger";
+import { hasPermissions } from "@lib/permissions";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -16,7 +17,7 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
     .addSubcommand((sub) =>
       sub
         .setName("set")
-        .setDescription("Set your birthday")
+        .setDescription("Set your (or someone else's) birthday")
         .addStringOption((opt) =>
           opt
             .setName("month")
@@ -35,9 +36,14 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
         .addIntegerOption((opt) =>
           opt
             .setName("year")
-            .setDescription("Birth year (optional, for age display)")
+            .setDescription("Birth year (optional)")
             .setMinValue(1900)
             .setMaxValue(new Date().getFullYear())
+        )
+        .addUserOption((opt) =>
+          opt
+            .setName("user")
+            .setDescription("Who's birthday? (optional, if it's not you)")
         )
     )
     .addSubcommand((sub) =>
@@ -48,7 +54,22 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
     .addSubcommand((sub) =>
       sub
         .setName("remove")
-        .setDescription("Remove your birthday from tracking")
+        .setDescription("Remove your (or someone else's) birthday")
+        .addUserOption((opt) =>
+          opt
+            .setName("user")
+            .setDescription("Who's birthday? (optional, if it's not you)")
+        )
+    )
+    .addSubcommand((sub) =>
+      sub
+        .setName("get")
+        .setDescription("Get your (or someone else's) birthday")
+        .addUserOption((opt) =>
+          opt
+            .setName("user")
+            .setDescription("Who's birthday? (optional, if it's not you)")
+        )
     ),
 
   async run({ interaction }) {
@@ -66,6 +87,8 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
       const monthName = interaction.options.getString("month", true);
       const day = interaction.options.getInteger("day", true);
       const year = interaction.options.getInteger("year");
+      const userArg = interaction.options.getUser("user");
+      const user = userArg && userArg.id !== interaction.user.id ? userArg : null;
 
       const month = MONTHS.indexOf(monthName) + 1;
       if (month === 0) {
@@ -78,7 +101,7 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
 
       try {
         await ServiceManager.birthday.setBirthday({
-          userId: interaction.user.id,
+          userId: user?.id ?? interaction.user.id,
           guildId: interaction.guildId,
           month,
           day,
@@ -86,8 +109,10 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
         });
 
         const dateStr = `${monthName} ${day}${year ? `, ${year}` : ""}`;
+        const userStr = user ? `${user}'s` : "Your";
+
         await interaction.reply({
-          content: `Your birthday has been set to **${dateStr}**!`,
+          content: `${userStr} birthday has been set to **${dateStr}**!`,
           flags: [MessageFlags.Ephemeral]
         });
       }
@@ -143,23 +168,77 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
     }
 
     else if (subcommand === "remove") {
+      const userArg = interaction.options.getUser("user");
+      const user = userArg && userArg.id !== interaction.user.id ? userArg : null;
+
       try {
         await ServiceManager.birthday.removeBirthday(
-          interaction.user.id,
+          user?.id ?? interaction.user.id,
           interaction.guildId
         );
+
+        const userStr = user ? `${user}'s` : "Your";
         await interaction.reply({
-          content: "Your birthday has been removed from tracking.",
+          content: `${userStr} birthday has been removed from tracking.`,
           flags: [MessageFlags.Ephemeral]
         });
       }
       catch {
+        const userDoesntStr = user ? `${user} doesn't` : "You don't";
         await interaction.reply({
-          content: "You don't have a birthday set!",
+          content: `${userDoesntStr} have a birthday set!`,
           flags: [MessageFlags.Ephemeral]
         });
       }
     }
+
+    else if (subcommand === "get") {
+      const userArg = interaction.options.getUser("user");
+      const user = userArg && userArg.id !== interaction.user.id ? userArg : null;
+
+      const birthday = await ServiceManager.birthday.getBirthday(
+        user?.id ?? interaction.user.id,
+        interaction.guildId
+      );
+
+      if (!birthday) {
+        const userDoesntStr = user ? `${user} doesn't` : "You don't";
+        await interaction.reply({
+          content: `${userDoesntStr} have a birthday set!`,
+          flags: [MessageFlags.Ephemeral]
+        });
+        return;
+      }
+
+      const yearStr = birthday.year ? `, ${birthday.year}` : "";
+      const monthName = MONTHS[birthday.month - 1];
+      const dateStr = `${monthName} ${birthday.day}${yearStr}`;
+
+      await interaction.reply({
+        content: `<@${birthday.userId}> - ${dateStr}\n`,
+        flags: [MessageFlags.Ephemeral]
+      });
+    }
+  },
+
+  options: {
+    middleware: [
+      ({ interaction }) => {
+        const sub = interaction.options.getSubcommand(false);
+        if (sub !== "set" && sub !== "remove") return { continue: true };
+
+        const target = interaction.options.getUser("user");
+        if (!target || target.id === interaction.user.id) return { continue: true };
+
+        if (!hasPermissions(interaction, ["ManageGuild"])) {
+          return {
+            continue: false,
+            error: "You can only manage your own birthday."
+          };
+        }
+        return { continue: true };
+      }
+    ]
   }
 };
 

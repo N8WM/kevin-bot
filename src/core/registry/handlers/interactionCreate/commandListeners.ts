@@ -48,15 +48,27 @@ const handler: EventHandler<Events.InteractionCreate> = {
     // Run middleware
     if (handler.options?.middleware && interaction.isChatInputCommand()) {
       for (const middleware of handler.options.middleware) {
-        const result = await middleware({
-          interaction,
-          client: interaction.client
-        });
+        try {
+          const result = await middleware({
+            interaction,
+            client: interaction.client
+          });
 
-        if (!result.continue) {
-          await interaction.reply({
-            content: result.error,
-            flags: [MessageFlags.Ephemeral]
+          if (!result.continue) {
+            await interaction.reply({
+              content: result.error,
+              flags: [MessageFlags.Ephemeral]
+            });
+            return;
+          }
+        }
+        catch (e) {
+          const error = e instanceof Error ? e : new Error(String(e));
+          await ErrorHandlerRegistry.handle(error, {
+            type: "middleware",
+            interaction,
+            middlewareName: middleware.name || undefined,
+            client: interaction.client
           });
           return;
         }
