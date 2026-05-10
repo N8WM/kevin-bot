@@ -79,6 +79,13 @@ export class BirthdayService extends BaseService {
   }
 
   /**
+   * Count all birthdays across all guilds
+   */
+  async count() {
+    return await this.prisma.birthday.count();
+  }
+
+  /**
    * Get all birthdays in a guild, sorted by next occurrence
    */
   async getUpcomingBirthdays(guildId: string, limit: number = 5) {
