@@ -24,7 +24,7 @@ const handler: ButtonHandler = {
           );
 
           if (!container) {
-            interaction.followUp({
+            await interaction.followUp({
               content: "Woah! Sorry, there are too many gifts!"
             });
             return;

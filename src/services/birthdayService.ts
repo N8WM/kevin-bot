@@ -71,7 +71,7 @@ export class BirthdayService extends BaseService {
    */
   async ensureRemoved(userId: string, guildId: string) {
     try {
-      this.removeBirthday(userId, guildId);
+      await this.removeBirthday(userId, guildId);
     }
     catch {
       // Silently ignore if user doesn't have a birthday
